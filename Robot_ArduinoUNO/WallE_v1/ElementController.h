@@ -3,19 +3,9 @@
 
 #include "baseElement.h"
 #include "SerialController.h"
+#include "config.h"
 
-//hard coded indexes of the elements
-enum ELEMENTS{
-  //DHT11,
-  ENGINES,
-  //GRAVITYSENSOR,
-  LEDS
-  //LIGHTSENSOR,
-  //SERVO,
-  //SPEAKER,
-  //ULTRASONICSENSOR
-};
-#define NELEMENTS 2
+
 
 
 class ElementController {
@@ -42,6 +32,8 @@ class ElementController {
           runElements(); break;
         case IDLE:
           idleElements(); break;
+        case WARNING:
+          warningElements(); break;
         case ERROR:
           errorElements(); break;
         default:
@@ -50,12 +42,20 @@ class ElementController {
     }
 
     void updateGlobalState() {
+
       if (NRegistered != NELEMENTS) {globalState=ERROR; return;}      
+      if (globalState==ERROR) return;   //error needs to be removed with a dedicated command
+
       for (int i=0; i<NELEMENTS; i++) {
         STATE elementState = elements[i]->getState();
+        
         if (elementState==ERROR) {globalState=ERROR; return;}
-        else if (elementState==SETUP) globalState=SETUP;
-        else if ((elementState==RUNNING)&&(globalState!=SETUP)&&(globalState!=IDLE)) globalState= RUNNING; 
+        else if (elementState==WARNING) {globalState=WARNING;}
+        if (elementState==WARNING) continue;    //could still be an error
+        
+        if (elementState==SETUP) globalState=SETUP;
+        if ((elementState==RUNNING)&&(globalState!=SETUP)&&(globalState!=IDLE)) globalState= RUNNING; 
+        if ((elementState==IDLE)&&(globalState!=SETUP)&&(globalState!=RUNNING)) globalState= IDLE; 
       }
     }
     
@@ -84,6 +84,7 @@ class ElementController {
     void setupElements(){for (int i=0; i<NELEMENTS; i++) elements[i]->onSetup();}
     void runElements(){for (int i=0; i<NELEMENTS; i++) elements[i]->onRun();}
     void idleElements(){for (int i=0; i<NELEMENTS; i++) elements[i]->onIdle();}
+    void warningElements(){for (int i=0; i<NELEMENTS; i++) elements[i]->onWarning();}
     void errorElements(){for (int i=0; i<NELEMENTS; i++) elements[i]->onError();}
     
     BaseElement** elements;

@@ -1,3 +1,6 @@
+#ifndef CONFIG_H
+#define CONFIG_H
+
 #include "Arduino.h"
 
 //pins for the engines
@@ -11,5 +14,24 @@ int PIN_RF = 11;    // define pin 11
 int PIN_LEDGreen = A2;
 int PIN_LEDYellow = A3;
 int PIN_Speaker = 10;
+
+
+//gravity sensor
+int PIN_BallSwitch = A0;
  
  
+
+#define NELEMENTS 3
+//hard coded indexes of the elements
+enum ELEMENTS{
+  //DHT11,
+  LEDS,
+  ENGINES,
+  GRAVITYSENSOR
+  //LIGHTSENSOR,
+  //SERVO,
+  //SPEAKER,
+  //ULTRASONICSENSOR
+};
+
+#endif

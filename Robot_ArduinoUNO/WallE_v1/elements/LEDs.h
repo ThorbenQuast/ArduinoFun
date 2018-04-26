@@ -10,17 +10,19 @@ int tones[] = {
 
 class LEDs: public BaseElement {
     public: 
-        LEDs(int pinLEDGreen, int pinLEDYellow, int pinSpeaker);
+        LEDs(int, int, int);
         void onSetup();
         void onRun();
         void onIdle();
+        void onWarning();
         void onError();
-        void onCommand(COMMAND cmd);
+        void onCommand(COMMAND);
     private:
         int pinLEDGreen;
         int pinLEDYellow;
         int pinSpeaker;
         void melody();
+        void alarm_tone();      
         void stop_melody();      
         bool* melody_playing;  
         //values of the chosen melody   
@@ -36,6 +38,7 @@ LEDs::LEDs(int _pinLEDGreen, int _pinLEDYellow, int _pinSpeaker) {
     this->pinSpeaker = _pinSpeaker;
     melody_playing = new bool;
     *melody_playing = false;
+    ownState=RUNNING;
 }
 
 void LEDs::onSetup(){
@@ -68,10 +71,15 @@ void LEDs::onIdle() {
     digitalWrite(pinLEDYellow, LOW); 
     stop_melody();
 };
-void LEDs::onError() {
+void LEDs::onWarning() {
     digitalWrite(pinLEDGreen, LOW);
     digitalWrite(pinLEDYellow, HIGH); 
     stop_melody();
+};
+void LEDs::onError() {
+    digitalWrite(pinLEDGreen, LOW);
+    digitalWrite(pinLEDYellow, HIGH); 
+    //alarm_tone();
 };
 void LEDs::onCommand(COMMAND cmd) {
     switch(cmd){
@@ -84,12 +92,16 @@ void LEDs::onCommand(COMMAND cmd) {
     }
 };
 
-
 void LEDs::melody(){
     toneindex=0;
     increment=1;
     duration = 500;
     *melody_playing = true;
+}
+
+void LEDs::alarm_tone(){
+    tone(pinSpeaker, tones[7], 100);
+    delay(100);    
 }
 
 void LEDs::stop_melody(){

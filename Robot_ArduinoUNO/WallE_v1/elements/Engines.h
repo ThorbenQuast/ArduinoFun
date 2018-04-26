@@ -6,12 +6,13 @@
 
 class Engine: public BaseElement {
     public: 
-        Engine(int pinLB, int pinLF, int pinRB, int pinRF);
+        Engine(int, int, int, int);
         void onSetup();
         void onRun();
         void onIdle();
+        void onWarning();
         void onError();
-        void onCommand(COMMAND cmd);
+        void onCommand(COMMAND);
     private:
         int pinLB;
         int pinLF;
@@ -42,6 +43,9 @@ void Engine::onSetup() {
 }
 void Engine::onRun() {}
 void Engine::onIdle() {
+    stopp();
+}
+void Engine::onWarning() {
     stopp();
 }
 void Engine::onError() {

@@ -8,7 +8,7 @@
 
 //#include "elements/DHT11.h"
 #include "elements/Engines.h"
-//#include "elements/GravitySensor.h"
+#include "elements/GravitySensor.h"
 #include "elements/LEDs.h"
 //#include "elements/LightSensor.h"
 //#include "elements/Servo.h"
@@ -19,12 +19,14 @@ char serial_val;
 
 BaseElement* engineInstance = new Engine(PIN_LB, PIN_LF, PIN_RB, PIN_RF);
 BaseElement* LEDsIntstance = new LEDs(PIN_LEDGreen, PIN_LEDYellow, PIN_Speaker);
+BaseElement* BallSwitchIntstance = new BallSwitch(PIN_BallSwitch);
 ElementController eController;
 
 void setup(){
   Serial.begin(9600);
   eController.registerElement(engineInstance, ENGINES);
   eController.registerElement(LEDsIntstance, LEDS);
+  eController.registerElement(BallSwitchIntstance, GRAVITYSENSOR);
   eController.forceGlobalState(SETUP);  
   eController.onLoop();
   eController.forceGlobalState(IDLE);

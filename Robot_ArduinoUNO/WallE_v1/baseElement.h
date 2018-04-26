@@ -8,6 +8,7 @@ enum STATE {
   SETUP,
   RUNNING,
   IDLE,
+  WARNING,
   ERROR
 };
 
@@ -18,6 +19,7 @@ class BaseElement {
     virtual void onSetup() = 0;
     virtual void onRun() = 0;
     virtual void onIdle() = 0;
+    virtual void onWarning() = 0;
     virtual void onError() = 0;
     virtual void onCommand(COMMAND) = 0;
 
