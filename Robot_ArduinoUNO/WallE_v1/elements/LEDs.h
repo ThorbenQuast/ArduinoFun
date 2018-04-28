@@ -16,7 +16,7 @@ class LEDs: public BaseElement {
         void onIdle();
         void onWarning();
         void onError();
-        void onCommand(COMMAND);
+        void onCommand(COMMAND, int&);
     private:
         int pinLEDGreen;
         int pinLEDYellow;
@@ -81,7 +81,7 @@ void LEDs::onError() {
     digitalWrite(pinLEDYellow, HIGH); 
     //alarm_tone();
 };
-void LEDs::onCommand(COMMAND cmd) {
+void LEDs::onCommand(COMMAND cmd, int &val) {
     switch(cmd){
         case SPEAKER_ANNOY:
             melody(); break;

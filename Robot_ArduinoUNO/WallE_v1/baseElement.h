@@ -21,7 +21,7 @@ class BaseElement {
     virtual void onIdle() = 0;
     virtual void onWarning() = 0;
     virtual void onError() = 0;
-    virtual void onCommand(COMMAND) = 0;
+    virtual void onCommand(COMMAND, int&) = 0;
 
     STATE ownState;
     void enforceState(STATE s) {
@@ -31,13 +31,6 @@ class BaseElement {
       return ownState;
     }    
 
-    COMMAND commandForTransmission;
-    COMMAND transmitCommand() {
-      COMMAND tbr = commandForTransmission;
-      eraseCommandForTransmission();
-      return tbr;
-    }
-    void eraseCommandForTransmission() {commandForTransmission=EMPTYCOMMAND;}
 };
 
 

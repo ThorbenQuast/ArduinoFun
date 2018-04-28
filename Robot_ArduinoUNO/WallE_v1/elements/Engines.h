@@ -12,7 +12,7 @@ class Engine: public BaseElement {
         void onIdle();
         void onWarning();
         void onError();
-        void onCommand(COMMAND);
+        void onCommand(COMMAND, int&);
     private:
         int pinLB;
         int pinLF;
@@ -24,6 +24,12 @@ class Engine: public BaseElement {
         void left();
         void right();        
         void back();
+
+        void proceed();
+        void (Engine::*prev_command)();
+
+        void setSpeed(int&);
+        int speed;
 };
 
 
@@ -32,6 +38,9 @@ Engine::Engine(int _pinLB, int _pinLF, int _pinRB, int _pinRF){
     this->pinLF = _pinLF;
     this->pinRB = _pinRB;
     this->pinRF = _pinRF;
+
+    prev_command=NULL;
+    speed = 255;
    
 }
 void Engine::onSetup() {
@@ -51,7 +60,7 @@ void Engine::onWarning() {
 void Engine::onError() {
     stopp();
 }
-void Engine::onCommand(COMMAND cmd) {    
+void Engine::onCommand(COMMAND cmd, int &val) {    
     switch (cmd) {
         case DRIVE_FORWARD:
             this->advance();
@@ -68,6 +77,12 @@ void Engine::onCommand(COMMAND cmd) {
         case DRIVE_STOP:
             this->stopp();
             break;
+        case DRIVE_PROCEED:
+            this->proceed();
+            break;
+        case DRIVE_SETSPEED:
+            this->setSpeed(val);
+            break;
         default: break;
     }
 }
@@ -76,8 +91,9 @@ void Engine::onCommand(COMMAND cmd) {
 void Engine::advance() {   
     digitalWrite(pinLB,LOW);  
     digitalWrite(pinRB,HIGH); 
-    analogWrite(pinLF, 255);
-    analogWrite(pinRF,255);  
+    analogWrite(pinLF, this->speed);
+    analogWrite(pinRF,this->speed);
+    prev_command=&Engine::advance;  
     ownState=RUNNING;
 }
 void Engine::stopp() {        
@@ -85,31 +101,41 @@ void Engine::stopp() {
     digitalWrite(pinRB,HIGH);
     analogWrite(pinLF,0);
     analogWrite(pinRF,0); 
+    prev_command=&Engine::stopp;
     ownState=IDLE;
 }
 void Engine::back() {        
     digitalWrite(pinLB,HIGH);  
     digitalWrite(pinRB,LOW); 
-    analogWrite(pinLF, 255);
-    analogWrite(pinRF,255);   
+    analogWrite(pinLF, this->speed);
+    analogWrite(pinRF,this->speed);   
+    prev_command=&Engine::back;
     ownState=RUNNING;
 }
 void Engine::left() {    
     digitalWrite(pinLB,LOW);    
     digitalWrite(pinRB, LOW);  
-    analogWrite(pinLF,255);   
-    analogWrite(pinRF,255);
+    analogWrite(pinLF,this->speed);   
+    analogWrite(pinRF,this->speed);
     ownState=RUNNING;
 }
 void Engine::right() {          
     digitalWrite(pinLB,HIGH);  
     digitalWrite(pinRB,HIGH);  
-    analogWrite(pinLF,255);  
-    analogWrite(pinRF,255);     
+    analogWrite(pinLF,this->speed);  
+    analogWrite(pinRF,this->speed);     
     ownState=RUNNING;
 }
 
+void Engine::proceed() {
+    if (prev_command!=NULL) (this->*prev_command)();    
+}
 
+
+void Engine::setSpeed(int &speed) {
+    this->speed = (255 - (9-speed)*5);
+    proceed();
+}
 
 
 

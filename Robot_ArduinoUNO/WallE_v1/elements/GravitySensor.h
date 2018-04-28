@@ -12,7 +12,7 @@ class BallSwitch: public BaseElement {
         void onIdle();
         void onWarning();
         void onError();
-        void onCommand(COMMAND);
+        void onCommand(COMMAND, int&);
     private:
         int pinBS;
         int analogVal;
@@ -28,7 +28,7 @@ BallSwitch::BallSwitch(int _pin) {
   threshold=50;
 }
 
-void BallSwitch::onCommand(COMMAND cmd) {}
+void BallSwitch::onCommand(COMMAND cmd, int &val) {}
 void BallSwitch::onSetup() {
   pinMode(this->pinBS,INPUT);
   digitalWrite(this->pinBS, HIGH);

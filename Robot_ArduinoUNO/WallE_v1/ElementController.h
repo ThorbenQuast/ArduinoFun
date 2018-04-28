@@ -18,10 +18,8 @@ class ElementController {
     STATE getGlobalState() {return globalState;};
     void forceGlobalState(STATE s) {
       globalState=s;
-      for (int i=0; i<NELEMENTS; i++) {
-        elements[i]->enforceState(s);
-        elements[i]->eraseCommandForTransmission();
-      }
+      for (int i=0; i<NELEMENTS; i++) elements[i]->enforceState(s);
+      
     };
     
     void onLoop(){
@@ -59,24 +57,15 @@ class ElementController {
       }
     }
     
-    void distributeElementCommands() {
-      for (int i=0; i<NELEMENTS; i++) {
-        COMMAND elementCommand = elements[i]->transmitCommand();
-        if (elementCommand != EMPTYCOMMAND) {
-          transferCommand(elementCommand);
-        }
-
-      }
-    }
 
     void registerElement(BaseElement* element, ELEMENTS name) {
       elements[name] = element;
       NRegistered++;
     }
 
-    void transferCommand(COMMAND cmd) {
+    void transferCommand(COMMAND cmd, int val) {
       if (globalState!=RUNNING) return;
-      for (int i=0; i<NELEMENTS; i++) elements[i]->onCommand(cmd);
+      for (int i=0; i<NELEMENTS; i++) elements[i]->onCommand(cmd, val);
     }
 
   private:

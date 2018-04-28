@@ -16,6 +16,7 @@
 //#include "elements/UltrasonicSensor.h"
 
 char serial_val;
+int receivingCommandState;
 
 BaseElement* engineInstance = new Engine(PIN_LB, PIN_LF, PIN_RB, PIN_RF);
 BaseElement* LEDsIntstance = new LEDs(PIN_LEDGreen, PIN_LEDYellow, PIN_Speaker);
@@ -30,34 +31,62 @@ void setup(){
   eController.forceGlobalState(SETUP);  
   eController.onLoop();
   eController.forceGlobalState(IDLE);
+  receivingCommandState = 0;
 }
 
     
 void loop() {
   serial_val = Serial.read();
-  serialProcess(serial_val);
+  if (!serialProcess()) return;	//more commands incoming
   eController.onLoop();
-  eController.distributeElementCommands();
   eController.updateGlobalState(); 
 }
 
 
-void serialProcess(char &val) {
+bool serialProcess() {
   
-  if (val==-1) return;
+  if (serial_val==-1) return true;
+  Serial.print(receivingCommandState); Serial.print(": "); Serial.println(serial_val);
 
-  //this has to be done within the SerialController.h file
-  if(val=='U')eController.transferCommand(DRIVE_FORWARD);
-  if(val=='D')eController.transferCommand(DRIVE_BACKWARD);
-  if(val=='L')eController.transferCommand(DRIVE_LEFT);
-  if(val=='R')eController.transferCommand(DRIVE_RIGHT);
-  if(val=='S')eController.transferCommand(DRIVE_STOP);
-  if(val=='M')eController.transferCommand(SPEAKER_ANNOY);
-  if(val=='N')eController.transferCommand(SPEAKER_STOP);
-  
-
-  if(val=='0')eController.forceGlobalState(eController.getGlobalState()==IDLE ? RUNNING : IDLE);
+  switch(receivingCommandState) {
+  	case 0:
+		if(serial_val=='0') {
+			eController.forceGlobalState(IDLE);
+		}  	
+		else if(serial_val=='1') {
+			eController.forceGlobalState(eController.getGlobalState()==IDLE ? RUNNING : IDLE);
+		}
+		else if (serial_val=='D') {
+			receivingCommandState=1000;
+			return false;
+		} else if (serial_val=='S') {
+			receivingCommandState=2000;
+			return false;
+		}
+		break;
+	case 1000:
+	  	if(serial_val=='F')eController.transferCommand(DRIVE_FORWARD, 0);
+	  	if(serial_val=='B')eController.transferCommand(DRIVE_BACKWARD, 0);
+	  	if(serial_val=='H')eController.transferCommand(DRIVE_STOP, 0);	  	
+	  	if(serial_val=='L')eController.transferCommand(DRIVE_LEFT, 0);
+	  	if(serial_val=='R')eController.transferCommand(DRIVE_RIGHT, 0);
+	  	if(serial_val=='P')eController.transferCommand(DRIVE_PROCEED, 0);
+	  	if(serial_val=='S') {receivingCommandState=1001; return false;}
+	  	receivingCommandState=0;
+	  	break;
+	case 1001:	//speed adjustment
+		if (serial_val - '0'==0) return false;
+		eController.transferCommand(DRIVE_SETSPEED, serial_val - '0');
+		receivingCommandState=0;
+		break;
+	case 2000:
+		if(serial_val=='P')eController.transferCommand(SPEAKER_ANNOY, 0);
+		if(serial_val=='M')eController.transferCommand(SPEAKER_STOP, 0);
+		receivingCommandState=0;
+		break;
+  } 
 
   eController.updateGlobalState();
+  return true;
 }
 
