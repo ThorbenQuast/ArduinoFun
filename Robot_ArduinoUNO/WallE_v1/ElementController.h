@@ -6,7 +6,7 @@
 #include "config.h"
 
 
-
+class baseElement;
 
 class ElementController {
   public:
@@ -58,16 +58,17 @@ class ElementController {
         
       }
     }
-    
-
-    void registerElement(BaseElement* element, ELEMENTS name) {
-      elements[name] = element;
-      NRegistered++;
-    }
 
     void transferCommand(COMMAND cmd, int val) {
       if (globalState!=RUNNING) return;
       for (int i=0; i<NELEMENTS; i++) elements[i]->onCommand(cmd, val);
+    }
+    
+    void registerElement(BaseElement* element, ELEMENTS name) {
+      element->command_toController = &ElementController::transferCommand;
+      element->ctl = this;
+      elements[name] = element;
+      NRegistered++;
     }
 
   private:

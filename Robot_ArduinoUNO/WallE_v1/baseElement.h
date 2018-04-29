@@ -2,6 +2,7 @@
 #define BASEELEMENT_H
 
 #include <Arduino.h>
+#include "ElementController.h"
 #include "SerialController.h"
 
 enum STATE {
@@ -12,6 +13,7 @@ enum STATE {
   ERROR
 };
 
+class ElementController;
 
 //interface class
 class BaseElement {
@@ -31,6 +33,13 @@ class BaseElement {
       return ownState;
     }    
 
+    //all baselements may transfer commands now
+    ElementController* ctl;
+    void (ElementController::*command_toController)(COMMAND, int);
+    void transferCommand(COMMAND cmd, int value) {
+
+      if (command_toController!=NULL) (ctl->*command_toController)(cmd, value);    
+    }
 };
 
 

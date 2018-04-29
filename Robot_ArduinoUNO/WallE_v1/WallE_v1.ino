@@ -1,10 +1,10 @@
 //Author: Thorben Quast
 //22 April 2018
 
-#include "baseElement.h"
-#include "config.h"
+//#include "config.h"
 #include "ElementController.h"
-#include "SerialController.h"
+//#include "SerialController.h"
+//#include "baseElement.h"
 
 //#include "elements/DHT11.h"
 #include "elements/Engines.h"
