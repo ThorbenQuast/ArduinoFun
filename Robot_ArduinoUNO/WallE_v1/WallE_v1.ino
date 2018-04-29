@@ -12,14 +12,15 @@
 #include "elements/LEDs.h"
 //#include "elements/LightSensor.h"
 //#include "elements/Servo.h"
-//#include "elements/Speaker.h"
+#include "elements/Speaker.h"
 //#include "elements/UltrasonicSensor.h"
 
 char serial_val;
 int receivingCommandState;
 
 BaseElement* engineInstance = new Engine(PIN_LB, PIN_LF, PIN_RB, PIN_RF);
-BaseElement* LEDsIntstance = new LEDs(PIN_LEDGreen, PIN_LEDYellow, PIN_Speaker);
+BaseElement* LEDsIntstance = new LEDs(PIN_LEDGreen, PIN_LEDYellow);
+BaseElement* SpeakerIntstance = new Speaker(PIN_Speaker);
 BaseElement* BallSwitchIntstance = new BallSwitch(PIN_BallSwitch);
 ElementController eController;
 
@@ -27,6 +28,7 @@ void setup(){
   Serial.begin(9600);
   eController.registerElement(engineInstance, ENGINES);
   eController.registerElement(LEDsIntstance, LEDS);
+  eController.registerElement(SpeakerIntstance, SPEAKER);
   eController.registerElement(BallSwitchIntstance, GRAVITYSENSOR);
   eController.forceGlobalState(SETUP);  
   eController.onLoop();

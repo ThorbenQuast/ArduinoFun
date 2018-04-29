@@ -21,16 +21,16 @@ int PIN_BallSwitch = A0;
  
  
 
-#define NELEMENTS 3
+#define NELEMENTS 4
 //hard coded indexes of the elements
 enum ELEMENTS{
   //DHT11,
   LEDS,
   ENGINES,
-  GRAVITYSENSOR
+  GRAVITYSENSOR,
   //LIGHTSENSOR,
   //SERVO,
-  //SPEAKER,
+  SPEAKER,
   //ULTRASONICSENSOR
 };
 

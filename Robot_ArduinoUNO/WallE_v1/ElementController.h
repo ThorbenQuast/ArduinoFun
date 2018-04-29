@@ -44,16 +44,18 @@ class ElementController {
       if (NRegistered != NELEMENTS) {globalState=ERROR; return;}      
       if (globalState==ERROR) return;   //error needs to be removed with a dedicated command
 
+      globalState=IDLE;
+
       for (int i=0; i<NELEMENTS; i++) {
         STATE elementState = elements[i]->getState();
         
         if (elementState==ERROR) {globalState=ERROR; return;}
         else if (elementState==WARNING) {globalState=WARNING;}
-        if (elementState==WARNING) continue;    //could still be an error
+        if (globalState==WARNING) continue;    //could still be an error
         
         if (elementState==SETUP) globalState=SETUP;
-        if ((elementState==RUNNING)&&(globalState!=SETUP)&&(globalState!=IDLE)) globalState= RUNNING; 
-        if ((elementState==IDLE)&&(globalState!=SETUP)&&(globalState!=RUNNING)) globalState= IDLE; 
+        if ((globalState!=SETUP)&&(elementState==RUNNING)) globalState=RUNNING;
+        
       }
     }
     
