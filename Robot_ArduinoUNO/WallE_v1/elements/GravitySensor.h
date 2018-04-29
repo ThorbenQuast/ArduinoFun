@@ -16,23 +16,23 @@ class BallSwitch: public BaseElement {
     private:
         int pinBS;
         int analogVal;
-        int tiltCounter;
         int readValue();
-        int threshold;    //need a threshold to count how often the tilt ball switch needs to be read as active in order to issue a warning
+        unsigned long beginOfWarningTime;
+        int threshold;    //need a timer to estimate how long the tilt ball switch needs to be read as active in order to issue a warning
                           //the higher this value, the higher is the inertia.
 };
 
 BallSwitch::BallSwitch(int _pin) {
   this->pinBS = _pin;
-  tiltCounter=0;
-  threshold=50;
+  beginOfWarningTime=0;
+  threshold=100;
 }
 
 void BallSwitch::onCommand(COMMAND cmd, int &val) {}
 void BallSwitch::onSetup() {
   pinMode(this->pinBS,INPUT);
   digitalWrite(this->pinBS, HIGH);
-  tiltCounter=0;
+  beginOfWarningTime=0;
   ownState=IDLE;
 }
 
@@ -55,10 +55,15 @@ void BallSwitch::onError() {
 
 int BallSwitch::readValue() {
   analogVal = digitalRead(pinBS);
-  if (analogVal==1) {if (tiltCounter<2*threshold) tiltCounter++;}
-  else tiltCounter=0;
+  if (analogVal==1) {
+    if (beginOfWarningTime==0) beginOfWarningTime=millis();
+    else return millis()-beginOfWarningTime;
+  }
+  else {
+    beginOfWarningTime=0;
+  }
 
-  return tiltCounter;
+  return 0;
 }
 
 
