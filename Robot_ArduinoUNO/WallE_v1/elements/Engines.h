@@ -133,7 +133,7 @@ void Engine::proceed() {
 
 
 void Engine::setSpeed(int &speed) {
-    this->speed = (255 - (9-speed)*5);
+    this->speed = (255 - (9-speed)*15);
     proceed();
 }
 
