@@ -39,6 +39,7 @@ int duration[] =
 int PIN_BUTTON = 3;
 bool BTN_ALREADY_PRESSED;
 int MAXTEMP = 0;
+int maxTempCounter;
 unsigned int iteration_counter;
 
 //define statemachine
@@ -63,7 +64,8 @@ void setup() {
 
   current_state = INIT;
   signalState(current_state);
-  iteration_counter=0;
+  iteration_counter = 0;
+  maxTempCounter = 0;
   delay(2000);
   current_state = IDLE;
 }
@@ -104,6 +106,8 @@ void signalState(STATE s){
 }
 
 void display_environemental_params(int temp, int humidity, bool good_reading) {
+    lcd.setCursor(0, 1);
+    lcd.print("               ");
     lcd.setCursor(0, 1);
     lcd.print(temp);
     lcd.setCursor(3, 1);
@@ -149,7 +153,10 @@ void loop() {
       iteration_counter=0;
   } else if (current_state==GOODREADING) {
       display_environemental_params(temperature, humidity, true);
-     if ((MAXTEMP>0)&&((int)temperature>=MAXTEMP)) current_state = TEMPWARNING;
+     if ((MAXTEMP>0)&&((int)temperature>=MAXTEMP)) maxTempCounter++;
+     else maxTempCounter=0;
+     
+     if (maxTempCounter>=3) current_state = TEMPWARNING;
      else current_state = TEMPOK;
      return;
   } else if (current_state==BADREADING) {
