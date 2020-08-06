@@ -157,7 +157,7 @@ void loop() {
     if (current_state==TEMPWARNING) {
         for (int thisNote = 0; thisNote < 11; thisNote++) {
             tone(PIN_SOUND, melody[thisNote], 1000/noteDurations[thisNote]);
-            delay(noteDurations[thisNote]*1.3);
+            delay(1000/noteDurations[thisNote]*1.3);
         }
         iteration_counter=0;
     }
